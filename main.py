@@ -58,19 +58,55 @@ class AppWindow(MainWindow):
         
         # Keep track of the original molecule text so we don't unnecessarily re-parse
         self._last_smiles = ""
+        self._updating_from_smiles = False
+        self._updating_from_editor = False
+        
+        # Connect to editor changes
+        self.editor.molChanged.connect(self.on_editor_mol_changed)
+
+    def on_editor_mol_changed(self):
+        if self._updating_from_smiles:
+            return
+            
+        if self.editor.mol is None:
+            if self.smilesInput.text().strip() != "":
+                self._updating_from_editor = True
+                self.smilesInput.setText("")
+                self._last_smiles = ""
+                self._updating_from_editor = False
+            return
+            
+        new_smiles = Chem.MolToSmiles(self.editor.mol)
+        if new_smiles != self.smilesInput.text().strip():
+            self._updating_from_editor = True
+            self.smilesInput.setText(new_smiles)
+            self._last_smiles = new_smiles
+            self._updating_from_editor = False
+            
+            # Re-run SMARTS search to update highlights on the new structure
+            self.on_smarts_changed(self.smartsInput.text())
 
     def on_smiles_changed(self, text):
+        if self._updating_from_editor:
+            return
+            
         text = text.strip()
         if text == self._last_smiles:
             return
         
         self._last_smiles = text
+        self._updating_from_smiles = True
+        
         if not text:
             self.editor.mol = None
             self.statusBar().showMessage("Cleared molecule.")
+            self._updating_from_smiles = False
             return
             
-        mol = Chem.MolFromSmiles(text, sanitize=False)
+        # Handle Reaction SMILES by converting > and >> to . (disconnected components)
+        parse_text = text.replace(">>", ".").replace(">", ".")
+            
+        mol = Chem.MolFromSmiles(parse_text, sanitize=False)
         if mol:
             try:
                 Chem.SanitizeMol(mol)
@@ -87,6 +123,8 @@ class AppWindow(MainWindow):
                 self.statusBar().showMessage(f"Error sanitizing SMILES: {e}")
         else:
             self.statusBar().showMessage("Invalid SMILES.")
+            
+        self._updating_from_smiles = False
 
     def on_smarts_changed(self, text):
         text = text.strip()
@@ -98,7 +136,10 @@ class AppWindow(MainWindow):
             self.update_match_label()
             return
             
-        smarts_mol = Chem.MolFromSmarts(text)
+        # Handle Reaction SMIRKS by converting > and >> to . (disconnected components)
+        parse_text = text.replace(">>", ".").replace(">", ".")
+            
+        smarts_mol = Chem.MolFromSmarts(parse_text)
         if smarts_mol:
             # Find all matches
             matches = self.editor.mol.GetSubstructMatches(smarts_mol)

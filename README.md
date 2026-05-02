@@ -6,8 +6,9 @@ Chemical structure editor and viewer built as a wrapper around [`rdeditor`](http
 
 This application preserves all the comprehensive drawing and editing capabilities of `rdeditor` while introducing  new search and rendering tools:
 
-*   **Dynamic SMILES Rendering:** A dedicated toolbar allows you to paste or type a SMILES string. The molecule is rendered in the editor canvas instantly as you type.
-*   **Interactive SMARTS Search:** A SMARTS input box allows you to perform substructure searches directly on the currently drawn or loaded molecule. 
+*   **Dynamic SMILES & Reaction SMILES Rendering:** A dedicated toolbar allows you to paste or type a SMILES string (or Reaction SMILES containing `>>` or `>`). The molecule is rendered in the editor canvas instantly as you type.
+*   **Round-Trip Synchronization:** Modifying the molecule on the visual canvas automatically regenerates the SMILES string and updates the SMILES input box in real time.
+*   **Interactive SMARTS & SMIRKS Search:** A SMARTS input box allows you to perform substructure searches directly on the currently drawn or loaded molecule. It fully supports matching Reaction SMIRKS against Reaction SMILES. 
 *   **Match Highlighting & Toggling:** Found a substructure match? The matching atoms are highlighted dynamically. Use the convenient `<-` and `->` buttons to cycle through all occurrences of the SMARTS pattern within your molecule.
 *   **Full `rdeditor` Integration:** Modify atoms, bonds, rings, adjust stereochemistry, and clean up 2D coordinates natively—all SMARTS highlights will track with the underlying RDKit molecule representation seamlessly.
 
@@ -35,8 +36,8 @@ uv run python main.py
 
 ### Navigating the Interface
 
-*   **SMILES Input Toolbar:** Located just below the main toolbars. Enter a valid SMILES string here to load it onto the canvas.
-*   **SMARTS Input Toolbar:** Located just below the SMILES toolbar. Enter a valid SMARTS pattern to highlight matching atoms in the current structure.
+*   **SMILES Input Toolbar:** Located just below the main toolbars. Enter a valid SMILES or Reaction SMILES string here to load it onto the canvas.
+*   **SMARTS Input Toolbar:** Located just below the SMILES toolbar. Enter a valid SMARTS or SMIRKS pattern to highlight matching atoms in the current structure.
 *   **Match Navigation:** Use the left (`<-`) and right (`->`) arrow buttons on the SMARTS toolbar to step through multiple matches.
 
 ## License
