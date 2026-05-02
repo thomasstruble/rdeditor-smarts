@@ -1,0 +1,11 @@
+[project]
+name = "rdkit-render"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pyside6>=6.11.0",
+    "rdeditor>=0.5.1",
+    "rdkit>=2026.3.1",
+]
